@@ -11,10 +11,12 @@ A comprehensive PowerShell script to automatically install and configure a compl
 This script installs and configures:
 
 ### Browsers
+
 - Google Chrome
 - Brave Browser
 
 ### Development Tools
+
 - Git for Windows
 - Node.js LTS
 - Python 3.12
@@ -22,11 +24,13 @@ This script installs and configures:
 - Postman
 
 ### IDEs & Editors
+
 - Visual Studio Code
 - Visual Studio 2022 Professional
-- Android Studio
+- **Android Studio** (Manual installation recommended - see notes below)
 
 ### Utilities
+
 - WinRAR
 - AnyDesk
 - Zoom
@@ -45,6 +49,7 @@ This script installs and configures:
 ### Method 1: Direct Execution (Recommended)
 
 1. **Download the script**:
+
    ```powershell
    git clone https://github.com/amin-bake/dev-installation-scripts.git
    cd dev-installation-scripts
@@ -66,54 +71,69 @@ powershell -ExecutionPolicy Bypass -File .\Install-DevEnvironment.ps1 [parameter
 
 ### Available Parameters
 
-| Parameter | Description |
-|-----------|-------------|
-| `-SkipSystemChecks` | Skip system requirement checks |
-| `-SkipDevTools` | Skip development tools configuration |
-| `-SkipIDEs` | Skip IDE installations |
-| `-ForceReinstall` | Force reinstall of existing applications |
+| Parameter               | Description                                                              |
+| ----------------------- | ------------------------------------------------------------------------ |
+| `-AutoInstall`          | Skip interactive mode and install all applications automatically         |
+| `-SkipSystemChecks`     | Skip system requirement checks                                           |
+| `-UseParallel`          | Enable parallel installation of applications (faster)                    |
+| `-MaxParallel <number>` | Maximum number of parallel installations (default: 4)                    |
+| `-ConfigFile <path>`    | Path to custom JSON configuration file                                   |
+| `-LogFile <path>`       | Path to log file (default: `%USERPROFILE%\dev-installation-install.log`) |
 
 ### Examples
 
 ```powershell
-# Install everything (default)
+# Interactive mode - choose applications to install
 .\Install-DevEnvironment.ps1
 
-# Skip IDE installations
-.\Install-DevEnvironment.ps1 -SkipIDEs
+# Install all applications automatically
+.\Install-DevEnvironment.ps1 -AutoInstall
 
-# Force reinstall all applications
-.\Install-DevEnvironment.ps1 -ForceReinstall
+# Use parallel installation for faster setup (up to 4 apps at once)
+.\Install-DevEnvironment.ps1 -UseParallel -MaxParallel 4
+
+# Use custom configuration file
+.\Install-DevEnvironment.ps1 -ConfigFile ".\my-apps.json"
 
 # Quick install without system checks
-.\Install-DevEnvironment.ps1 -SkipSystemChecks
+.\Install-DevEnvironment.ps1 -SkipSystemChecks -AutoInstall
+
+# Parallel install with custom log location
+.\Install-DevEnvironment.ps1 -UseParallel -LogFile "C:\Logs\install.log"
 ```
 
 ## ⚙️ What the Script Does
 
 ### System Checks
+
 - Verifies Windows version compatibility
 - Checks available disk space and RAM
 - Validates administrator privileges
 
 ### Package Manager Setup
+
 - Installs Windows Package Manager (WinGet) if available
 - Installs Chocolatey package manager
 - Falls back to direct downloads when needed
 
 ### Application Installation
+
+- **Interactive Mode**: Choose which applications to install
+- **Automated Mode**: Install all applications automatically with `-AutoInstall`
+- **Parallel Installation**: Install multiple applications simultaneously with `-UseParallel`
 - Attempts installation via WinGet (fastest)
 - Falls back to Chocolatey
 - Uses direct downloads as final fallback
-- Special handling for problematic applications (Android Studio)
+- **Android Studio**: Prompts for manual installation (due to large file size >1GB)
 
 ### Environment Configuration
+
 - Adds development tools to PATH
 - Configures Git with basic settings
-- Installs essential VS Code extensions
 - Sets up Docker service
-- Creates development folder structure
-- Optimizes PowerShell execution policy
+- Creates development folder structure (`Projects`, `Scripts`, `Temp`, `Backups`)
+- Comprehensive logging to track installation progress
+- Real-time progress indicators for installation status
 
 ## 🔧 Post-Installation Steps
 
@@ -124,7 +144,10 @@ powershell -ExecutionPolicy Bypass -File .\Install-DevEnvironment.ps1 [parameter
    git config --global user.name "Your Name"
    git config --global user.email "your.email@example.com"
    ```
-4. **Launch Android Studio** to complete SDK setup
+4. **Install Android Studio manually** (if selected):
+   - Visit: https://developer.android.com/studio
+   - Download the latest version for Windows
+   - Run the installer and configure SDK settings
 5. **Verify installations** by running:
    ```powershell
    # Check installed tools
@@ -134,29 +157,39 @@ powershell -ExecutionPolicy Bypass -File .\Install-DevEnvironment.ps1 [parameter
    code --version
    docker --version
    ```
+6. **Check installation log** for any errors:
+   ```powershell
+   Get-Content "$env:USERPROFILE\dev-installation-install.log"
+   ```
 
 ## 🐛 Troubleshooting
 
 ### Common Issues
 
 **"Execution Policy" Error**
+
 ```powershell
 Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 ```
 
 **Chocolatey Installation Fails**
+
 - Ensure you're running as Administrator
 - Check internet connection
 - Try manual Chocolatey installation
 
 **Application Installation Fails**
+
 - Some applications may require manual installation
 - Check the installation summary for failed applications
 - Download directly from official websites
 
 **Android Studio Issues**
-- The script attempts multiple download sources
-- If all fail, download manually from developer.android.com
+
+- **Note**: Android Studio is no longer automatically downloaded due to its large file size (>1GB)
+- The script will prompt you to download it manually from https://developer.android.com/studio
+- This ensures faster script execution and better control over the installation
+- Follow the on-screen prompts to open the download page in your browser
 
 ### Manual Installation Links
 
@@ -171,6 +204,16 @@ If automatic installation fails, download manually:
 ## 🤝 Contributing
 
 We welcome contributions! Please follow these guidelines:
+
+### New Features in This Version
+
+- ✨ **Parallel Installation**: Install multiple applications simultaneously for faster setup
+- 📊 **Real-time Progress Indicators**: Visual progress bars with live status updates
+- 📝 **Comprehensive Logging**: Detailed logs saved automatically for troubleshooting
+- ⚙️ **Configuration File Support**: Use JSON files to customize installation packages
+- 🎯 **Android Studio Manual Install**: Faster script execution by prompting manual download
+- 🔄 **Enhanced Error Handling**: Retry logic with exponential backoff for network issues
+- 🔒 **Secure Downloads**: File integrity checks and certificate validation
 
 ### Development Setup
 
@@ -188,6 +231,7 @@ We welcome contributions! Please follow these guidelines:
 ### Code Guidelines
 
 #### PowerShell Best Practices
+
 - Use meaningful variable names
 - Add comments for complex logic
 - Follow PowerShell naming conventions (Verb-Noun)
@@ -195,12 +239,14 @@ We welcome contributions! Please follow these guidelines:
 - Test functions independently
 
 #### Script Structure
+
 - Keep functions focused and single-purpose
 - Use consistent indentation (4 spaces)
 - Group related functions together
 - Add parameter validation where appropriate
 
 #### Application Definitions
+
 When adding new applications to the `$Applications` hashtable:
 
 ```powershell
@@ -233,6 +279,7 @@ When adding new applications to the `$Applications` hashtable:
 ### Adding New Applications
 
 1. **Research installation methods**:
+
    - Check WinGet: `winget search "app name"`
    - Check Chocolatey: `choco search app-name`
    - Find official download URLs
@@ -246,6 +293,7 @@ When adding new applications to the `$Applications` hashtable:
 ### Reporting Issues
 
 When reporting bugs:
+
 - Include Windows version and PowerShell version
 - Describe the exact error message
 - List which applications failed to install
@@ -258,6 +306,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## ⚖️ Disclaimer
 
 This script is provided as-is. While we strive for reliability, automatic installations can sometimes fail due to:
+
 - Network connectivity issues
 - Conflicting software
 - System-specific configurations
